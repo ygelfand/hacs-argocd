@@ -49,7 +49,7 @@ class ArgoCDAppEntity(CoordinatorEntity[ArgoCDCoordinator]):
         name = app.name if app else self._app_key
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self._entry.entry_id}:{self._app_key}")},
-            name=name,
+            name=f"ArgoCD {name}",
             manufacturer="Argo CD",
             model="Application",
             via_device=(DOMAIN, self._entry.entry_id),
@@ -88,7 +88,7 @@ class ArgoCDClusterEntity(CoordinatorEntity[ArgoCDCoordinator]):
             identifiers={
                 (DOMAIN, f"{self._entry.entry_id}:cluster:{self._cluster_key}")
             },
-            name=f"Cluster: {name}",
+            name=f"ArgoCD cluster {name}",
             manufacturer="Argo CD",
             model="Cluster",
             via_device=(DOMAIN, self._entry.entry_id),

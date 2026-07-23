@@ -5,8 +5,8 @@
         "title": "Add ArgoCD",
         "description": "Choose how Home Assistant should connect to ArgoCD.",
         "menu_options": {
-          "rest": "ArgoCD REST API (recommended)",
-          "k8s": "Kubernetes API (read Application CRDs)"
+          "rest": "ArgoCD API (token or username/password)",
+          "k8s": "Kubernetes API (ServiceAccount)"
         }
       },
       "rest": {

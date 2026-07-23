@@ -50,19 +50,19 @@ async def _setup(hass: HomeAssistant, client: AsyncMock) -> MockConfigEntry:
 async def test_entities_created(hass: HomeAssistant) -> None:
     await _setup(hass, _fake_client())
 
-    sync = hass.states.get("sensor.guestbook_sync_status")
+    sync = hass.states.get("sensor.argocd_guestbook_sync_status")
     assert sync is not None and sync.state == "synced"
     assert sync.attributes["revision"] == "abc1234"
 
-    health = hass.states.get("sensor.guestbook_health")
+    health = hass.states.get("sensor.argocd_guestbook_health")
     assert health is not None and health.state == "healthy"
 
-    assert hass.states.get("binary_sensor.guestbook_out_of_sync").state == "off"
-    assert hass.states.get("binary_sensor.broken_out_of_sync").state == "on"
-    assert hass.states.get("binary_sensor.broken_unhealthy").state == "on"
+    assert hass.states.get("binary_sensor.argocd_guestbook_out_of_sync").state == "off"
+    assert hass.states.get("binary_sensor.argocd_broken_out_of_sync").state == "on"
+    assert hass.states.get("binary_sensor.argocd_broken_unhealthy").state == "on"
 
     # Buttons exist (write enabled by default).
-    assert hass.states.get("button.guestbook_sync") is not None
+    assert hass.states.get("button.argocd_guestbook_sync") is not None
 
     # Aggregate summary: 2 apps, 1 out of sync, 1 unhealthy.
     summary = hass.states.get("sensor.argocd_example_com_applications")
@@ -83,14 +83,15 @@ async def test_cluster_entities(hass: HomeAssistant) -> None:
     ]
     await _setup(hass, _fake_client(clusters))
 
-    status = hass.states.get("sensor.cluster_prod_connection")
+    status = hass.states.get("sensor.argocd_cluster_prod_connection")
     assert status is not None and status.state == "failed"
-    assert hass.states.get("binary_sensor.cluster_prod_unreachable").state == "on"
+    unreachable = hass.states.get("binary_sensor.argocd_cluster_prod_unreachable")
+    assert unreachable.state == "on"
 
 
 async def test_no_cluster_entities_without_clusters(hass: HomeAssistant) -> None:
     await _setup(hass, _fake_client())
-    assert hass.states.get("sensor.cluster_prod_connection") is None
+    assert hass.states.get("sensor.argocd_cluster_prod_connection") is None
 
 
 async def test_sync_service(hass: HomeAssistant) -> None:
@@ -122,7 +123,7 @@ async def test_sync_service_by_entity_target(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         DOMAIN,
         SERVICE_SYNC,
-        {"entity_id": "sensor.guestbook_sync_status"},
+        {"entity_id": "sensor.argocd_guestbook_sync_status"},
         blocking=True,
     )
     client.sync_application.assert_awaited_once_with(
@@ -137,7 +138,7 @@ async def test_button_press_triggers_sync(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         "button",
         "press",
-        {"entity_id": "button.guestbook_sync"},
+        {"entity_id": "button.argocd_guestbook_sync"},
         blocking=True,
     )
     client.sync_application.assert_awaited_once_with("guestbook", "argocd")
