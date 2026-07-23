@@ -1,0 +1,43 @@
+sync:
+  target:
+    entity:
+      integration: argocd
+    device:
+      integration: argocd
+  fields:
+    application:
+      example: guestbook
+      selector:
+        text:
+    namespace:
+      example: argocd
+      selector:
+        text:
+    prune:
+      default: false
+      selector:
+        boolean:
+    revision:
+      example: HEAD
+      selector:
+        text:
+
+refresh:
+  target:
+    entity:
+      integration: argocd
+    device:
+      integration: argocd
+  fields:
+    application:
+      example: guestbook
+      selector:
+        text:
+    namespace:
+      example: argocd
+      selector:
+        text:
+    hard:
+      default: false
+      selector:
+        boolean:

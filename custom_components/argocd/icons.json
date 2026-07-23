@@ -1,0 +1,59 @@
+{
+  "entity": {
+    "sensor": {
+      "sync_status": {
+        "default": "mdi:sync",
+        "state": {
+          "Synced": "mdi:sync",
+          "OutOfSync": "mdi:sync-alert",
+          "Unknown": "mdi:sync-off"
+        }
+      },
+      "health_status": {
+        "default": "mdi:heart-pulse",
+        "state": {
+          "Healthy": "mdi:heart",
+          "Progressing": "mdi:progress-clock",
+          "Degraded": "mdi:heart-broken",
+          "Suspended": "mdi:pause-circle",
+          "Missing": "mdi:help-circle",
+          "Unknown": "mdi:help-circle-outline"
+        }
+      },
+      "applications_summary": {
+        "default": "mdi:apps"
+      },
+      "cluster_status": {
+        "default": "mdi:kubernetes",
+        "state": {
+          "Successful": "mdi:server-network",
+          "Failed": "mdi:server-network-off",
+          "Unknown": "mdi:server-network-outline"
+        }
+      }
+    },
+    "binary_sensor": {
+      "out_of_sync": {
+        "default": "mdi:sync-alert"
+      },
+      "unhealthy": {
+        "default": "mdi:heart-broken"
+      },
+      "cluster_unreachable": {
+        "default": "mdi:server-network-off"
+      }
+    },
+    "button": {
+      "sync": {
+        "default": "mdi:sync"
+      },
+      "refresh": {
+        "default": "mdi:refresh"
+      }
+    }
+  },
+  "services": {
+    "sync": "mdi:sync",
+    "refresh": "mdi:refresh"
+  }
+}

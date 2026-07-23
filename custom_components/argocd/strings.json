@@ -1,0 +1,218 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add ArgoCD",
+        "description": "Choose how Home Assistant should connect to ArgoCD.",
+        "menu_options": {
+          "rest": "ArgoCD REST API (recommended)",
+          "k8s": "Kubernetes API (read Application CRDs)"
+        }
+      },
+      "rest": {
+        "title": "ArgoCD REST API",
+        "data": {
+          "base_url": "ArgoCD server URL",
+          "auth_mode": "Authentication",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "base_url": "For example https://argocd.example.com"
+        }
+      },
+      "rest_token": {
+        "title": "ArgoCD API token",
+        "data": {
+          "token": "API token"
+        },
+        "data_description": {
+          "token": "Generate one with: argocd account generate-token"
+        }
+      },
+      "rest_userpass": {
+        "title": "ArgoCD username & password",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "filters": {
+        "title": "Name & filters",
+        "description": "Discovered {count} application(s). Name this ArgoCD instance and optionally limit which applications are tracked. Leave the filters empty to track them all; pick from the lists or type your own.",
+        "data": {
+          "name": "Name",
+          "project": "Projects",
+          "app_namespace": "Application namespaces"
+        }
+      },
+      "k8s": {
+        "title": "Kubernetes API",
+        "data": {
+          "auth_mode": "Credentials",
+          "namespace": "Namespace (optional, e.g. argocd)"
+        },
+        "data_description": {
+          "namespace": "Leave empty to read Applications across all namespaces the ServiceAccount can see."
+        }
+      },
+      "k8s_manual": {
+        "title": "Kubernetes API (manual)",
+        "data": {
+          "api_url": "Kubernetes API server URL",
+          "token": "ServiceAccount token",
+          "verify_ssl": "Verify SSL certificate",
+          "ca_cert": "CA certificate (optional)"
+        },
+        "data_description": {
+          "api_url": "For example https://10.0.0.1:6443",
+          "ca_cert": "Paste the PEM contents, or give a file path on the Home Assistant host."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate ArgoCD",
+        "description": "Your ArgoCD credentials are no longer valid. Enter a new one.",
+        "data": {
+          "token": "API token",
+          "password": "Password"
+        }
+      }
+    },
+    "selector": {
+      "rest_auth_mode": {
+        "options": {
+          "token": "API token",
+          "userpass": "Username & password"
+        }
+      },
+      "k8s_auth_mode": {
+        "options": {
+          "in_cluster": "In-cluster ServiceAccount (auto-discover)",
+          "manual": "Manual (URL + token)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check the URL and network.",
+      "invalid_auth": "Authentication failed. Check your token or credentials.",
+      "bad_certificate": "TLS certificate could not be verified. Provide a CA certificate or disable verification.",
+      "unknown": "Unexpected error. See the logs for details."
+    },
+    "abort": {
+      "already_configured": "This ArgoCD instance is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "ArgoCD settings were updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ArgoCD options",
+        "data": {
+          "scan_interval": "Update interval (seconds)",
+          "enable_write": "Enable sync/refresh actions",
+          "auto_add_discovered": "Automatically add newly discovered applications and clusters",
+          "enable_watch": "Stream changes in real time (watch)"
+        },
+        "data_description": {
+          "auto_add_discovered": "When on, entities are created automatically for applications (and clusters) that appear after setup.",
+          "enable_watch": "Push application changes instantly via a watch stream instead of waiting for the next poll. The update interval becomes a periodic safety net."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "sync_status": {
+        "name": "Sync status",
+        "state": {
+          "Synced": "Synced",
+          "OutOfSync": "Out of sync",
+          "Unknown": "Unknown"
+        }
+      },
+      "health_status": {
+        "name": "Health",
+        "state": {
+          "Healthy": "Healthy",
+          "Progressing": "Progressing",
+          "Degraded": "Degraded",
+          "Suspended": "Suspended",
+          "Missing": "Missing",
+          "Unknown": "Unknown"
+        }
+      },
+      "applications_summary": {
+        "name": "Applications"
+      },
+      "cluster_status": {
+        "name": "Connection",
+        "state": {
+          "Successful": "Connected",
+          "Failed": "Failed",
+          "Unknown": "Unknown"
+        }
+      }
+    },
+    "binary_sensor": {
+      "out_of_sync": {
+        "name": "Out of sync"
+      },
+      "unhealthy": {
+        "name": "Unhealthy"
+      },
+      "cluster_unreachable": {
+        "name": "Unreachable"
+      }
+    },
+    "button": {
+      "sync": {
+        "name": "Sync"
+      },
+      "refresh": {
+        "name": "Refresh"
+      }
+    }
+  },
+  "services": {
+    "sync": {
+      "name": "Sync application",
+      "description": "Trigger a sync for an ArgoCD application.",
+      "fields": {
+        "application": {
+          "name": "Application",
+          "description": "Name of the ArgoCD application."
+        },
+        "namespace": {
+          "name": "Namespace",
+          "description": "Namespace the Application lives in (needed only to disambiguate)."
+        },
+        "prune": {
+          "name": "Prune",
+          "description": "Delete resources that are no longer defined in Git."
+        },
+        "revision": {
+          "name": "Revision",
+          "description": "Git revision / branch / tag to sync to."
+        }
+      }
+    },
+    "refresh": {
+      "name": "Refresh application",
+      "description": "Ask ArgoCD to re-compare live and desired state.",
+      "fields": {
+        "application": {
+          "name": "Application",
+          "description": "Name of the ArgoCD application."
+        },
+        "namespace": {
+          "name": "Namespace",
+          "description": "Namespace the Application lives in (needed only to disambiguate)."
+        },
+        "hard": {
+          "name": "Hard refresh",
+          "description": "Also invalidate cached cluster resources."
+        }
+      }
+    }
+  }
+}
