@@ -76,6 +76,17 @@ HEALTH_SUSPENDED: Final = "Suspended"
 HEALTH_MISSING: Final = "Missing"
 HEALTH_UNKNOWN: Final = "Unknown"
 
+# All possible values, in display order (used to build the enum sensor options).
+SYNC_STATES: Final = (SYNC_SYNCED, SYNC_OUT_OF_SYNC, SYNC_UNKNOWN)
+HEALTH_STATES: Final = (
+    HEALTH_HEALTHY,
+    HEALTH_PROGRESSING,
+    HEALTH_DEGRADED,
+    HEALTH_SUSPENDED,
+    HEALTH_MISSING,
+    HEALTH_UNKNOWN,
+)
+
 # Health states that are NOT considered a problem.
 HEALTHY_STATES: Final = frozenset({HEALTH_HEALTHY, HEALTH_SUSPENDED})
 

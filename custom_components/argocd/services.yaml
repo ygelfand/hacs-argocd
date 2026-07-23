@@ -2,8 +2,6 @@ sync:
   target:
     entity:
       integration: argocd
-    device:
-      integration: argocd
   fields:
     application:
       example: guestbook
@@ -25,8 +23,6 @@ sync:
 refresh:
   target:
     entity:
-      integration: argocd
-    device:
       integration: argocd
   fields:
     application:

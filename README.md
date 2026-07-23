@@ -1,12 +1,14 @@
 # ArgoCD for Home Assistant
 
+<p align="center">
+  <img src="custom_components/argocd/brand/icon.png" width="96" alt="ArgoCD for Home Assistant icon">
+</p>
+
 [![hacs][hacs-badge]][hacs] [![Validate](https://github.com/ygelfand/hacs-argocd/actions/workflows/validate.yml/badge.svg)](https://github.com/ygelfand/hacs-argocd/actions/workflows/validate.yml)
 
 A custom [Home Assistant](https://www.home-assistant.io/) integration that
 monitors [Argo CD](https://argo-cd.readthedocs.io/) Applications and lets you
 trigger syncs and refreshes from automations and dashboards.
-
-<img src="custom_components/argocd/brand/icon.png" width="96" align="right" alt="ArgoCD for Home Assistant icon">
 
 ## Features
 
@@ -39,6 +41,10 @@ trigger syncs and refreshes from automations and dashboards.
 ## Installation
 
 ### HACS (custom repository)
+
+[![My Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ygelfand&repository=hacs-argocd&category=Integration)
+
+Click the badge to add this repo to HACS in one step, or add it manually:
 
 1. HACS → ⋮ → **Custom repositories**.
 2. Add `https://github.com/ygelfand/hacs-argocd` with category **Integration**.

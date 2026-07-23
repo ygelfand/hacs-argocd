@@ -4,20 +4,20 @@
       "sync_status": {
         "default": "mdi:sync",
         "state": {
-          "Synced": "mdi:sync",
-          "OutOfSync": "mdi:sync-alert",
-          "Unknown": "mdi:sync-off"
+          "synced": "mdi:sync",
+          "outofsync": "mdi:sync-alert",
+          "unknown": "mdi:sync-off"
         }
       },
       "health_status": {
         "default": "mdi:heart-pulse",
         "state": {
-          "Healthy": "mdi:heart",
-          "Progressing": "mdi:progress-clock",
-          "Degraded": "mdi:heart-broken",
-          "Suspended": "mdi:pause-circle",
-          "Missing": "mdi:help-circle",
-          "Unknown": "mdi:help-circle-outline"
+          "healthy": "mdi:heart",
+          "progressing": "mdi:progress-clock",
+          "degraded": "mdi:heart-broken",
+          "suspended": "mdi:pause-circle",
+          "missing": "mdi:help-circle",
+          "unknown": "mdi:help-circle-outline"
         }
       },
       "applications_summary": {
@@ -26,9 +26,9 @@
       "cluster_status": {
         "default": "mdi:kubernetes",
         "state": {
-          "Successful": "mdi:server-network",
-          "Failed": "mdi:server-network-off",
-          "Unknown": "mdi:server-network-outline"
+          "successful": "mdi:server-network",
+          "failed": "mdi:server-network-off",
+          "unknown": "mdi:server-network-outline"
         }
       }
     },

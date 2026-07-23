@@ -51,11 +51,11 @@ async def test_entities_created(hass: HomeAssistant) -> None:
     await _setup(hass, _fake_client())
 
     sync = hass.states.get("sensor.guestbook_sync_status")
-    assert sync is not None and sync.state == "Synced"
+    assert sync is not None and sync.state == "synced"
     assert sync.attributes["revision"] == "abc1234"
 
     health = hass.states.get("sensor.guestbook_health")
-    assert health is not None and health.state == "Healthy"
+    assert health is not None and health.state == "healthy"
 
     assert hass.states.get("binary_sensor.guestbook_out_of_sync").state == "off"
     assert hass.states.get("binary_sensor.broken_out_of_sync").state == "on"
@@ -84,7 +84,7 @@ async def test_cluster_entities(hass: HomeAssistant) -> None:
     await _setup(hass, _fake_client(clusters))
 
     status = hass.states.get("sensor.cluster_prod_connection")
-    assert status is not None and status.state == "Failed"
+    assert status is not None and status.state == "failed"
     assert hass.states.get("binary_sensor.cluster_prod_unreachable").state == "on"
 
 

@@ -125,20 +125,20 @@
       "sync_status": {
         "name": "Sync status",
         "state": {
-          "Synced": "Synced",
-          "OutOfSync": "Out of sync",
-          "Unknown": "Unknown"
+          "synced": "Synced",
+          "outofsync": "Out of sync",
+          "unknown": "Unknown"
         }
       },
       "health_status": {
         "name": "Health",
         "state": {
-          "Healthy": "Healthy",
-          "Progressing": "Progressing",
-          "Degraded": "Degraded",
-          "Suspended": "Suspended",
-          "Missing": "Missing",
-          "Unknown": "Unknown"
+          "healthy": "Healthy",
+          "progressing": "Progressing",
+          "degraded": "Degraded",
+          "suspended": "Suspended",
+          "missing": "Missing",
+          "unknown": "Unknown"
         }
       },
       "applications_summary": {
@@ -147,9 +147,9 @@
       "cluster_status": {
         "name": "Connection",
         "state": {
-          "Successful": "Connected",
-          "Failed": "Failed",
-          "Unknown": "Unknown"
+          "successful": "Connected",
+          "failed": "Failed",
+          "unknown": "Unknown"
         }
       }
     },

@@ -17,30 +17,14 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import (
-    DOMAIN,
-    HEALTH_DEGRADED,
-    HEALTH_HEALTHY,
-    HEALTH_MISSING,
-    HEALTH_PROGRESSING,
-    HEALTH_SUSPENDED,
-    HEALTH_UNKNOWN,
-    SYNC_OUT_OF_SYNC,
-    SYNC_SYNCED,
-    SYNC_UNKNOWN,
-)
+from .const import DOMAIN, HEALTH_STATES, SYNC_STATES
 from .coordinator import ArgoCDConfigEntry, ArgoCDCoordinator
 from .entity import (
     ArgoCDAppEntity,
     ArgoCDClusterEntity,
     async_register_dynamic_entities,
 )
-from .models import (
-    CLUSTER_FAILED,
-    CLUSTER_SUCCESSFUL,
-    CLUSTER_UNKNOWN,
-    ArgoApplication,
-)
+from .models import CLUSTER_STATES, ArgoApplication
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -56,8 +40,8 @@ APP_SENSORS: tuple[ArgoAppSensorDescription, ...] = (
         key="sync_status",
         translation_key="sync_status",
         device_class=SensorDeviceClass.ENUM,
-        options=[SYNC_SYNCED, SYNC_OUT_OF_SYNC, SYNC_UNKNOWN],
-        value_fn=lambda app: app.sync_status,
+        options=list(map(str.lower, SYNC_STATES)),
+        value_fn=lambda app: app.sync_status.lower(),
         attributes_fn=lambda app: {
             "revision": app.revision,
             "target_revision": app.target_revision,
@@ -69,15 +53,8 @@ APP_SENSORS: tuple[ArgoAppSensorDescription, ...] = (
         key="health_status",
         translation_key="health_status",
         device_class=SensorDeviceClass.ENUM,
-        options=[
-            HEALTH_HEALTHY,
-            HEALTH_PROGRESSING,
-            HEALTH_DEGRADED,
-            HEALTH_SUSPENDED,
-            HEALTH_MISSING,
-            HEALTH_UNKNOWN,
-        ],
-        value_fn=lambda app: app.health_status,
+        options=list(map(str.lower, HEALTH_STATES)),
+        value_fn=lambda app: app.health_status.lower(),
         attributes_fn=lambda app: {
             "message": app.health_message,
             "operation_phase": app.operation_phase,
@@ -192,7 +169,7 @@ class ArgoCDClusterSensor(ArgoCDClusterEntity, SensorEntity):
 
     _attr_translation_key = "cluster_status"
     _attr_device_class = SensorDeviceClass.ENUM
-    _attr_options = [CLUSTER_SUCCESSFUL, CLUSTER_FAILED, CLUSTER_UNKNOWN]
+    _attr_options = list(map(str.lower, CLUSTER_STATES))
 
     def __init__(
         self,
@@ -207,7 +184,7 @@ class ArgoCDClusterSensor(ArgoCDClusterEntity, SensorEntity):
     def native_value(self) -> str | None:
         if (cluster := self.cluster) is None:
             return None
-        return cluster.connection_status
+        return cluster.connection_status.lower()
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:

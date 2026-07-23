@@ -107,6 +107,7 @@ class ArgoApplication:
 CLUSTER_SUCCESSFUL = "Successful"
 CLUSTER_FAILED = "Failed"
 CLUSTER_UNKNOWN = "Unknown"
+CLUSTER_STATES = (CLUSTER_SUCCESSFUL, CLUSTER_FAILED, CLUSTER_UNKNOWN)
 
 
 @dataclass(slots=True)
