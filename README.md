@@ -19,9 +19,10 @@ trigger syncs and refreshes from automations and dashboards.
     kube-apiserver, using an in-cluster ServiceAccount (auto-discovered) or a
     manually supplied URL + token. No exposed ArgoCD API server required.
 - **Per-application entities:**
-  - `sensor` — **sync status** (Synced / OutOfSync) and **health**
-    (Healthy / Degraded / Progressing / …), with revision, repo, and
-    destination attributes.
+  - `sensor` — **sync status** (Synced / OutOfSync), **health**
+    (Healthy / Degraded / Progressing / …), and **last sync** (timestamp of the
+    most recent sync, with `initiated_by` / `automated` attributes). Revision,
+    repo, and destination are exposed as attributes.
   - `binary_sensor` — **out of sync** and **unhealthy** problem flags.
   - `button` — **Sync** and **Refresh** (when write actions are enabled).
 - **Aggregate sensor** — total applications plus out-of-sync / unhealthy counts

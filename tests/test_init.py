@@ -57,6 +57,12 @@ async def test_entities_created(hass: HomeAssistant) -> None:
     health = hass.states.get("sensor.argocd_guestbook_health")
     assert health is not None and health.state == "healthy"
 
+    last_sync = hass.states.get("sensor.argocd_guestbook_last_sync")
+    assert last_sync is not None
+    assert last_sync.state not in ("unknown", "unavailable")
+    assert last_sync.attributes["initiated_by"] == "alice"
+    assert last_sync.attributes["automated"] is False
+
     assert hass.states.get("binary_sensor.argocd_guestbook_out_of_sync").state == "off"
     assert hass.states.get("binary_sensor.argocd_broken_out_of_sync").state == "on"
     assert hass.states.get("binary_sensor.argocd_broken_unhealthy").state == "on"

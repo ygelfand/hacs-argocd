@@ -24,6 +24,8 @@ def test_parse_healthy_app() -> None:
     assert app.dest_server == "https://kubernetes.default.svc"
     assert app.operation_phase == "Succeeded"
     assert app.last_sync_at is not None
+    assert app.initiated_by == "alice"
+    assert app.automated is False
     assert app.resource_count == 2
     assert app.is_synced is True
     assert app.is_healthy is True

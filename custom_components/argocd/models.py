@@ -52,6 +52,8 @@ class ArgoApplication:
     dest_server: str | None = None
     operation_phase: str | None = None
     last_sync_at: datetime | None = None
+    initiated_by: str | None = None
+    automated: bool = False
     resource_count: int = 0
     raw: dict[str, Any] = field(default_factory=dict, repr=False)
 
@@ -84,6 +86,8 @@ class ArgoApplication:
         resources = status.get("resources")
         resource_count = len(resources) if isinstance(resources, list) else 0
 
+        initiated_by = _get(status, "operationState", "operation", "initiatedBy") or {}
+
         return cls(
             name=metadata.get("name", ""),
             namespace=metadata.get("namespace", ""),
@@ -99,6 +103,8 @@ class ArgoApplication:
             dest_server=destination.get("server") or destination.get("name"),
             operation_phase=_get(status, "operationState", "phase"),
             last_sync_at=_parse_ts(_get(status, "operationState", "finishedAt")),
+            initiated_by=initiated_by.get("username"),
+            automated=bool(initiated_by.get("automated", False)),
             resource_count=resource_count,
             raw=obj,
         )

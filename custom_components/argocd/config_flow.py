@@ -129,7 +129,9 @@ class ArgoCDConfigFlow(ConfigFlow, domain=DOMAIN):
             return await self.async_step_k8s()
         return await self.async_step_rest()
 
-    def _form(self, step_id: str, schema: vol.Schema, errors: dict) -> ConfigFlowResult:
+    def _form(
+        self, step_id: str, schema: vol.Schema, errors: dict[str, str]
+    ) -> ConfigFlowResult:
         """Show a form, pre-filling fields from current data (for reconfigure)."""
         return self.async_show_form(
             step_id=step_id,

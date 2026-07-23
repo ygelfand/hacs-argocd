@@ -32,7 +32,11 @@ SAMPLE_APP: dict = {
     "status": {
         "sync": {"status": "Synced", "revision": "abc1234"},
         "health": {"status": "Healthy", "message": "all good"},
-        "operationState": {"phase": "Succeeded", "finishedAt": "2026-07-01T12:00:00Z"},
+        "operationState": {
+            "phase": "Succeeded",
+            "finishedAt": "2026-07-01T12:00:00Z",
+            "operation": {"initiatedBy": {"username": "alice", "automated": False}},
+        },
         "resources": [{"kind": "Deployment"}, {"kind": "Service"}],
     },
 }

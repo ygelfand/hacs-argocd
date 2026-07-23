@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -15,6 +16,7 @@ from homeassistant.components.sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, HEALTH_STATES, SYNC_STATES
@@ -31,7 +33,7 @@ from .models import CLUSTER_STATES, ArgoApplication
 class ArgoAppSensorDescription(SensorEntityDescription):
     """Describes an ArgoCD per-application sensor."""
 
-    value_fn: Callable[[ArgoApplication], str | None]
+    value_fn: Callable[[ArgoApplication], StateType | datetime]
     attributes_fn: Callable[[ArgoApplication], dict[str, Any]]
 
 
@@ -63,6 +65,18 @@ APP_SENSORS: tuple[ArgoAppSensorDescription, ...] = (
             "dest_server": app.dest_server,
             "project": app.project,
             "resource_count": app.resource_count,
+        },
+    ),
+    ArgoAppSensorDescription(
+        key="last_sync",
+        translation_key="last_sync",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda app: app.last_sync_at,
+        attributes_fn=lambda app: {
+            "operation_phase": app.operation_phase,
+            "initiated_by": app.initiated_by,
+            "automated": app.automated,
+            "revision": app.revision,
         },
     ),
 )
@@ -113,7 +127,7 @@ class ArgoCDAppSensor(ArgoCDAppEntity, SensorEntity):
         self._attr_unique_id = f"{entry.entry_id}:{app_key}:{description.key}"
 
     @property
-    def native_value(self) -> str | None:
+    def native_value(self) -> StateType | datetime:
         if (app := self.app) is None:
             return None
         return self.entity_description.value_fn(app)

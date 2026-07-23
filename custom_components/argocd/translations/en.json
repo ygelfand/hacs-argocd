@@ -144,6 +144,9 @@
       "applications_summary": {
         "name": "Applications"
       },
+      "last_sync": {
+        "name": "Last sync"
+      },
       "cluster_status": {
         "name": "Connection",
         "state": {

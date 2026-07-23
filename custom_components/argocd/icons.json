@@ -23,6 +23,9 @@
       "applications_summary": {
         "default": "mdi:apps"
       },
+      "last_sync": {
+        "default": "mdi:history"
+      },
       "cluster_status": {
         "default": "mdi:kubernetes",
         "state": {
