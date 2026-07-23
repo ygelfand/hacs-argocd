@@ -77,20 +77,6 @@
         }
       }
     },
-    "selector": {
-      "rest_auth_mode": {
-        "options": {
-          "token": "API token",
-          "userpass": "Username & password"
-        }
-      },
-      "k8s_auth_mode": {
-        "options": {
-          "in_cluster": "In-cluster ServiceAccount (auto-discover)",
-          "manual": "Manual (URL + token)"
-        }
-      }
-    },
     "error": {
       "cannot_connect": "Failed to connect. Check the URL and network.",
       "invalid_auth": "Authentication failed. Check your token or credentials.",
@@ -101,6 +87,20 @@
       "already_configured": "This ArgoCD instance is already configured.",
       "reauth_successful": "Re-authentication was successful.",
       "reconfigure_successful": "ArgoCD settings were updated."
+    }
+  },
+  "selector": {
+    "rest_auth_mode": {
+      "options": {
+        "token": "API token",
+        "userpass": "Username & password"
+      }
+    },
+    "k8s_auth_mode": {
+      "options": {
+        "in_cluster": "In-cluster ServiceAccount (auto-discover)",
+        "manual": "Manual (URL + token)"
+      }
     }
   },
   "options": {
