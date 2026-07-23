@@ -17,7 +17,7 @@
           "verify_ssl": "Verify SSL certificate"
         },
         "data_description": {
-          "base_url": "For example https://argocd.example.com"
+          "base_url": "The address of your ArgoCD server, including the scheme."
         }
       },
       "rest_token": {
@@ -64,7 +64,7 @@
           "ca_cert": "CA certificate (optional)"
         },
         "data_description": {
-          "api_url": "For example https://10.0.0.1:6443",
+          "api_url": "The Kubernetes API server address, including scheme and port.",
           "ca_cert": "Paste the PEM contents, or give a file path on the Home Assistant host."
         }
       },
