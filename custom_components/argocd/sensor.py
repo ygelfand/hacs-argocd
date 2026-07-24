@@ -13,17 +13,26 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, HEALTH_STATES, SYNC_STATES
+from .const import (
+    HEALTH_DEGRADED,
+    HEALTH_HEALTHY,
+    HEALTH_MISSING,
+    HEALTH_PROGRESSING,
+    HEALTH_STATES,
+    HEALTH_SUSPENDED,
+    HEALTH_UNKNOWN,
+    SYNC_STATES,
+)
 from .coordinator import ArgoCDConfigEntry, ArgoCDCoordinator
 from .entity import (
     ArgoCDAppEntity,
     ArgoCDClusterEntity,
+    ArgoCDInstanceEntity,
     async_register_dynamic_entities,
 )
 from .models import CLUSTER_STATES, ArgoApplication
@@ -82,6 +91,83 @@ APP_SENSORS: tuple[ArgoAppSensorDescription, ...] = (
 )
 
 
+@dataclass(frozen=True, kw_only=True)
+class ArgoInstanceCountDescription(SensorEntityDescription):
+    """Describes an instance-wide count sensor derived from the app list."""
+
+    count_fn: Callable[[list[ArgoApplication]], int]
+
+
+# Operation phases that mean the last sync did not succeed.
+_FAILED_PHASES = frozenset({"Failed", "Error"})
+
+
+def _health_is(status: str) -> Callable[[list[ArgoApplication]], int]:
+    return lambda apps: sum(1 for a in apps if a.health_status == status)
+
+
+INSTANCE_COUNTS: tuple[ArgoInstanceCountDescription, ...] = (
+    # Actionable aggregates + per-status problem counts (shown by default).
+    ArgoInstanceCountDescription(
+        key="out_of_sync",
+        translation_key="out_of_sync_count",
+        count_fn=lambda apps: sum(1 for a in apps if not a.is_synced),
+    ),
+    ArgoInstanceCountDescription(
+        key="unhealthy",
+        translation_key="unhealthy_count",
+        count_fn=lambda apps: sum(1 for a in apps if not a.is_healthy),
+    ),
+    ArgoInstanceCountDescription(
+        key="sync_failed",
+        translation_key="sync_failed_count",
+        count_fn=lambda apps: sum(
+            1 for a in apps if a.operation_phase in _FAILED_PHASES
+        ),
+    ),
+    ArgoInstanceCountDescription(
+        key="health_degraded",
+        translation_key="degraded_count",
+        count_fn=_health_is(HEALTH_DEGRADED),
+    ),
+    ArgoInstanceCountDescription(
+        key="health_missing",
+        translation_key="missing_count",
+        count_fn=_health_is(HEALTH_MISSING),
+    ),
+    ArgoInstanceCountDescription(
+        key="health_unknown",
+        translation_key="health_unknown_count",
+        count_fn=_health_is(HEALTH_UNKNOWN),
+    ),
+    # Normal / transient states — available but off by default to avoid clutter.
+    ArgoInstanceCountDescription(
+        key="syncing",
+        translation_key="syncing_count",
+        count_fn=lambda apps: sum(1 for a in apps if a.operation_phase == "Running"),
+        entity_registry_enabled_default=False,
+    ),
+    ArgoInstanceCountDescription(
+        key="health_progressing",
+        translation_key="progressing_count",
+        count_fn=_health_is(HEALTH_PROGRESSING),
+        entity_registry_enabled_default=False,
+    ),
+    ArgoInstanceCountDescription(
+        key="health_suspended",
+        translation_key="suspended_count",
+        count_fn=_health_is(HEALTH_SUSPENDED),
+        entity_registry_enabled_default=False,
+    ),
+    ArgoInstanceCountDescription(
+        key="health_healthy",
+        translation_key="healthy_count",
+        count_fn=_health_is(HEALTH_HEALTHY),
+        entity_registry_enabled_default=False,
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ArgoCDConfigEntry,
@@ -107,7 +193,14 @@ async def async_setup_entry(
         cluster_factory,
         lambda: coordinator.clusters,
     )
-    async_add_entities([ArgoCDSummarySensor(coordinator, entry)])
+
+    instance: list[SensorEntity] = [ArgoCDSummarySensor(coordinator, entry)]
+    instance += [
+        ArgoCDInstanceCountSensor(coordinator, entry, desc) for desc in INSTANCE_COUNTS
+    ]
+    if coordinator.version is not None:
+        instance.append(ArgoCDVersionSensor(coordinator, entry))
+    async_add_entities(instance)
 
 
 class ArgoCDAppSensor(ArgoCDAppEntity, SensorEntity):
@@ -139,10 +232,9 @@ class ArgoCDAppSensor(ArgoCDAppEntity, SensorEntity):
         return self.entity_description.attributes_fn(app)
 
 
-class ArgoCDSummarySensor(CoordinatorEntity[ArgoCDCoordinator], SensorEntity):
-    """Aggregate sensor: total apps plus out-of-sync / unhealthy counts."""
+class ArgoCDSummarySensor(ArgoCDInstanceEntity, SensorEntity):
+    """Aggregate sensor: total apps, with a per-health-status breakdown."""
 
-    _attr_has_entity_name = True
     _attr_translation_key = "applications_summary"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "apps"
@@ -150,15 +242,8 @@ class ArgoCDSummarySensor(CoordinatorEntity[ArgoCDCoordinator], SensorEntity):
     def __init__(
         self, coordinator: ArgoCDCoordinator, entry: ArgoCDConfigEntry
     ) -> None:
-        super().__init__(coordinator)
-        self._entry = entry
+        super().__init__(coordinator, entry)
         self._attr_unique_id = f"{entry.entry_id}:summary"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name=entry.title,
-            manufacturer="Argo CD",
-            model="ArgoCD instance",
-        )
 
     @property
     def native_value(self) -> int:
@@ -173,9 +258,47 @@ class ArgoCDSummarySensor(CoordinatorEntity[ArgoCDCoordinator], SensorEntity):
         return {
             "out_of_sync": sum(1 for a in apps if not a.is_synced),
             "unhealthy": sum(1 for a in apps if not a.is_healthy),
-            "syncing": sum(1 for a in apps if a.operation_phase == "Running"),
             "health_breakdown": breakdown,
         }
+
+
+class ArgoCDInstanceCountSensor(ArgoCDInstanceEntity, SensorEntity):
+    """A single instance-wide count (e.g. out-of-sync or degraded apps)."""
+
+    entity_description: ArgoInstanceCountDescription
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = "apps"
+
+    def __init__(
+        self,
+        coordinator: ArgoCDCoordinator,
+        entry: ArgoCDConfigEntry,
+        description: ArgoInstanceCountDescription,
+    ) -> None:
+        super().__init__(coordinator, entry)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry.entry_id}:{description.key}"
+
+    @property
+    def native_value(self) -> int:
+        return self.entity_description.count_fn(list(self.coordinator.data.values()))
+
+
+class ArgoCDVersionSensor(ArgoCDInstanceEntity, SensorEntity):
+    """The ArgoCD server version (REST backend only)."""
+
+    _attr_translation_key = "server_version"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(
+        self, coordinator: ArgoCDCoordinator, entry: ArgoCDConfigEntry
+    ) -> None:
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}:version"
+
+    @property
+    def native_value(self) -> str | None:
+        return self.coordinator.version
 
 
 class ArgoCDClusterSensor(ArgoCDClusterEntity, SensorEntity):

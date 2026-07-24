@@ -95,6 +95,27 @@ class ArgoCDClusterEntity(CoordinatorEntity[ArgoCDCoordinator]):
         )
 
 
+class ArgoCDInstanceEntity(CoordinatorEntity[ArgoCDCoordinator]):
+    """Base entity for instance-wide sensors (the ArgoCD instance device)."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self, coordinator: ArgoCDCoordinator, entry: ArgoCDConfigEntry
+    ) -> None:
+        super().__init__(coordinator)
+        self._entry = entry
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._entry.entry_id)},
+            name=self._entry.title,
+            manufacturer="Argo CD",
+            model="ArgoCD instance",
+        )
+
+
 def async_register_dynamic_entities(
     entry: ArgoCDConfigEntry,
     coordinator: ArgoCDCoordinator,

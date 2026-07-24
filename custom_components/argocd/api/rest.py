@@ -117,6 +117,10 @@ class ArgoCDRestClient(ArgoCDClient):
         items = data.get("items") or []
         return [ArgoCluster.from_api(item) for item in items]
 
+    async def get_version(self) -> str | None:
+        data = await self._request("GET", "/api/v1/version")
+        return data.get("Version")
+
     async def sync_application(
         self,
         name: str,

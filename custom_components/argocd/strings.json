@@ -144,6 +144,17 @@
       "applications_summary": {
         "name": "Applications"
       },
+      "out_of_sync_count": { "name": "Out of sync" },
+      "unhealthy_count": { "name": "Unhealthy" },
+      "sync_failed_count": { "name": "Sync failed" },
+      "degraded_count": { "name": "Degraded" },
+      "missing_count": { "name": "Missing" },
+      "health_unknown_count": { "name": "Unknown" },
+      "syncing_count": { "name": "Syncing" },
+      "progressing_count": { "name": "Progressing" },
+      "suspended_count": { "name": "Suspended" },
+      "healthy_count": { "name": "Healthy" },
+      "server_version": { "name": "Server version" },
       "last_sync": {
         "name": "Last sync"
       },

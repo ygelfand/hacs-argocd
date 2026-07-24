@@ -46,9 +46,10 @@ class ArgoCDCoordinator(DataUpdateCoordinator[dict[str, ArgoApplication]]):
         self._projects = set(entry.data.get(CONF_PROJECT) or [])
         self._namespaces = set(entry.data.get(CONF_APP_NAMESPACE) or [])
         # Populated best-effort each cycle (REST backend only); read by the
-        # cluster entities. Not part of coordinator ``data`` so a cluster hiccup
-        # never fails the primary application refresh.
+        # cluster / version entities. Not part of coordinator ``data`` so a
+        # hiccup here never fails the primary application refresh.
         self.clusters: dict[str, ArgoCluster] = {}
+        self.version: str | None = None
 
     def _matches_filters(self, app: ArgoApplication) -> bool:
         if self._projects and app.project not in self._projects:
@@ -69,9 +70,10 @@ class ArgoCDCoordinator(DataUpdateCoordinator[dict[str, ArgoApplication]]):
         try:
             clusters = await self.client.list_clusters()
             self.clusters = {c.unique_id: c for c in clusters}
-        except Exception as err:  # noqa: BLE001 - cluster data is best-effort
-            # Never let a cluster hiccup fail the primary application refresh.
-            _LOGGER.debug("Could not list ArgoCD clusters: %s", err)
+            self.version = await self.client.get_version()
+        except Exception as err:  # noqa: BLE001 - cluster/version data is best-effort
+            # Never let a cluster/version hiccup fail the application refresh.
+            _LOGGER.debug("Could not fetch ArgoCD clusters/version: %s", err)
 
         return self._filtered(apps)
 

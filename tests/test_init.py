@@ -28,6 +28,7 @@ def _fake_client(clusters: list | None = None) -> AsyncMock:
         ArgoApplication.from_api(SAMPLE_APP_DEGRADED),
     ]
     client.list_clusters.return_value = clusters or []
+    client.get_version.return_value = "v2.11.0"
     return client
 
 
@@ -75,6 +76,17 @@ async def test_entities_created(hass: HomeAssistant) -> None:
     assert summary is not None and summary.state == "2"
     assert summary.attributes["out_of_sync"] == 1
     assert summary.attributes["unhealthy"] == 1
+
+    # Instance count sensors (the "broken" app is OutOfSync + Degraded).
+    assert hass.states.get("sensor.argocd_example_com_out_of_sync").state == "1"
+    assert hass.states.get("sensor.argocd_example_com_unhealthy").state == "1"
+    assert hass.states.get("sensor.argocd_example_com_degraded").state == "1"
+    assert hass.states.get("sensor.argocd_example_com_missing").state == "0"
+    # Server version (REST-only diagnostic).
+    version = hass.states.get("sensor.argocd_example_com_server_version")
+    assert version is not None and version.state == "v2.11.0"
+    # "Healthy" count is registered disabled-by-default, so it has no state.
+    assert hass.states.get("sensor.argocd_example_com_healthy") is None
 
 
 async def test_cluster_entities(hass: HomeAssistant) -> None:

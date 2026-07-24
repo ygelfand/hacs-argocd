@@ -56,6 +56,10 @@ class ArgoCDClient(ABC):
         """
         return []
 
+    async def get_version(self) -> str | None:
+        """Return the ArgoCD server version, or None if not available."""
+        return None
+
     @abstractmethod
     async def sync_application(
         self,

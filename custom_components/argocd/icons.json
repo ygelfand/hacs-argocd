@@ -23,6 +23,17 @@
       "applications_summary": {
         "default": "mdi:apps"
       },
+      "out_of_sync_count": { "default": "mdi:sync-alert" },
+      "unhealthy_count": { "default": "mdi:heart-broken" },
+      "sync_failed_count": { "default": "mdi:sync-off" },
+      "degraded_count": { "default": "mdi:heart-broken" },
+      "missing_count": { "default": "mdi:help-circle" },
+      "health_unknown_count": { "default": "mdi:help-circle-outline" },
+      "syncing_count": { "default": "mdi:sync" },
+      "progressing_count": { "default": "mdi:progress-clock" },
+      "suspended_count": { "default": "mdi:pause-circle" },
+      "healthy_count": { "default": "mdi:heart" },
+      "server_version": { "default": "mdi:tag-outline" },
       "last_sync": {
         "default": "mdi:history"
       },
